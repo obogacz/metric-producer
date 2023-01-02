@@ -1,5 +1,6 @@
 package com.richcode;
 
+import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,8 +45,9 @@ public class Main {
 
     }
 
+    @SneakyThrows
     private static void action() {
-        // does sth
+        Thread.sleep(2137);
     }
 
     private static String throwableCallbackAction() throws Exception {

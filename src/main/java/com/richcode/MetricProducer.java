@@ -27,32 +27,32 @@ public class MetricProducer {
     private final String name;
     private final String className;
     private final String methodName;
-    private final LocalDateTime start;
     private final List<Param> params = new LinkedList<>();
     private final boolean debug;
+    private LocalDateTime start;
 
     public static MetricProducer create(String name) {
-        return new MetricProducer(name, null, null, LocalDateTime.now(), false);
+        return new MetricProducer(name, null, null, false);
     }
 
     public static MetricProducer create(String name, Class<?> clazz) {
-        return new MetricProducer(name, clazz.getName(), null, LocalDateTime.now(), false);
+        return new MetricProducer(name, clazz.getName(), null, false);
     }
 
     public static MetricProducer create(String name, Class<?>  clazz, String method) {
-        return new MetricProducer(name, clazz.getName(), method, LocalDateTime.now(), false);
+        return new MetricProducer(name, clazz.getName(), method, false);
     }
 
     public static MetricProducer createInDebug(String name) {
-        return new MetricProducer(name, null, null, LocalDateTime.now(), true);
+        return new MetricProducer(name, null, null, true);
     }
 
     public static MetricProducer createInDebug(String name, Class<?>  clazz) {
-        return new MetricProducer(name, clazz.getName(), null, LocalDateTime.now(), true);
+        return new MetricProducer(name, clazz.getName(), null, true);
     }
 
     public static MetricProducer createInDebug(String name, Class<?>  clazz, String method) {
-        return new MetricProducer(name, clazz.getName(), method, LocalDateTime.now(), true);
+        return new MetricProducer(name, clazz.getName(), method, true);
     }
 
     public MetricProducer addParam(String name, Number value) {
@@ -85,6 +85,7 @@ public class MetricProducer {
     }
 
     public <E extends Throwable> void measure(Action<E> action) throws E {
+        initStartTime();
         try {
             action.execute();
         } catch (Throwable throwable) {
@@ -96,6 +97,7 @@ public class MetricProducer {
     }
 
     public <T, E extends Throwable> T measure(CallbackAction<T, E> action) throws E {
+        initStartTime();
         try {
             return action.execute();
         } catch (Throwable throwable) {
@@ -120,7 +122,7 @@ public class MetricProducer {
     }
 
     private void addDefaultParams() {
-        addParam(PARAM_EXECUTION_TIME, start.until(LocalDateTime.now(), ChronoUnit.MILLIS));
+        addParam(PARAM_EXECUTION_TIME, calculateExecutionTime());
         if (className != null) {
             addParam(PARAM_CLASS_NAME, className);
         }
@@ -137,6 +139,14 @@ public class MetricProducer {
         return params.stream()
                 .map(Param::toString)
                 .collect(joining(", "));
+    }
+
+    private void initStartTime() {
+        start = LocalDateTime.now();
+    }
+
+    private long calculateExecutionTime() {
+        return start.until(LocalDateTime.now(), ChronoUnit.MILLIS);
     }
 
     public interface Action<E extends Throwable> {
