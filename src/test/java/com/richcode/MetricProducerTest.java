@@ -40,6 +40,8 @@ class MetricProducerTest {
         assertTrue(appender.contains("metric-name: \"test-metric\""));
         assertTrue(appender.contains("params"));
         assertTrue(appender.contains("executionTime"));
+        assertFalse(appender.contains("exception: true"));
+
     }
 
     @Test
@@ -158,6 +160,16 @@ class MetricProducerTest {
                 .measure(() -> "test");
 
         assertEquals("test", result);
+    }
+
+    @Test
+    void shouldProduceLogWithExceptionFlag() {
+        assertThrows(Exception.class, () -> MetricProducer.create("test-metric")
+                .measure(() -> {
+                    throw new Exception();
+                }));
+
+        assertTrue(appender.contains("exception: true"));
     }
 
     private void doNothing() {

@@ -20,6 +20,7 @@ public class MetricProducer {
     private static final String PARAM_CLASS_NAME = "class";
     private static final String PARAM_METHOD_NAME = "method";
     private static final String PARAM_EXECUTION_TIME = "executionTime";
+    private static final String PARAM_EXCEPTION = "exception";
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -86,6 +87,9 @@ public class MetricProducer {
     public <E extends Throwable> void measure(Action<E> action) throws E {
         try {
             action.execute();
+        } catch (Throwable throwable) {
+            addExceptionParam();
+            throw throwable;
         } finally {
             emit();
         }
@@ -94,6 +98,9 @@ public class MetricProducer {
     public <T, E extends Throwable> T measure(CallbackAction<T, E> action) throws E {
         try {
             return action.execute();
+        } catch (Throwable throwable) {
+            addExceptionParam();
+            throw throwable;
         } finally {
             emit();
         }
@@ -120,6 +127,10 @@ public class MetricProducer {
         if (methodName != null) {
             addParam(PARAM_METHOD_NAME, methodName);
         }
+    }
+
+    private void addExceptionParam() {
+        addParam(PARAM_EXCEPTION, true);
     }
 
     private String getParamsAsString() {

@@ -7,6 +7,7 @@ import java.util.Date;
 
 @Slf4j
 public class Main {
+
     public static void main(String[] args) {
 
         // Basic usage
@@ -30,6 +31,15 @@ public class Main {
                     .measure(Main::throwableCallbackAction);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+        // Exception flag
+        try {
+            MetricProducer.create("action")
+                    .measure(() -> {
+                        throw new Exception();
+                    });
+        } catch (Exception e) {
         }
 
     }
