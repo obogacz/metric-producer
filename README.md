@@ -54,7 +54,7 @@ String result = MetricProducer.create("action")
 // metric-name: "action", params: {executionTime: 2}
 ```
 
-### Throwable action
+### Throwable action (exception: true)
 ```java
 MetricProducer.create("action")
         .measure(() -> {
@@ -62,5 +62,5 @@ MetricProducer.create("action")
         });
 
 // output:
-// metric-name: "action", params: {executionTime: 1}
+// metric-name: "action", params: {exception: true, executionTime: 1}
 ```
